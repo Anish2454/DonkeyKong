@@ -1,12 +1,48 @@
+patches-own [ origColor ]
+
+to setup
+  ca
+  resize-world 0 700 0 700
+  set-patch-size 1
+  import-pcolors "donkeykong1.jpg"
+  ask patches [
+    patches_setup ]
+  crt 1 [ turtle_setup ]
+end
+
+to patches_setup
+  set origcolor pcolor
+end
+
+to turtle_setup
+  set xcor 155
+  set ycor 90
+  set size 15
+  set heading 90
+  set shape "car"
+end
+
+to moveRight
+  set xcor xcor + 5
+end
+
+to moveUp
+  if pcolor > 80 and pcolor < 90
+  [ set ycor ycor + 1 ]
+end
+
+to resetColors
+  set pcolor origColor
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
 10
-649
-470
-16
-16
-13.0
+921
+742
+-1
+-1
+1.0
 1
 10
 1
@@ -16,15 +52,83 @@ GRAPHICS-WINDOW
 1
 1
 1
--16
-16
--16
-16
+0
+700
+0
+700
 0
 0
 1
 ticks
 30.0
+
+BUTTON
+23
+40
+86
+73
+NIL
+setup\n
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+30
+100
+120
+133
+NIL
+moveRight
+NIL
+1
+T
+TURTLE
+NIL
+D
+NIL
+NIL
+1
+
+BUTTON
+105
+43
+200
+76
+NIL
+resetColors\n\n
+NIL
+1
+T
+PATCH
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+29
+154
+106
+187
+NIL
+moveUp\n
+NIL
+1
+T
+TURTLE
+NIL
+W
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
