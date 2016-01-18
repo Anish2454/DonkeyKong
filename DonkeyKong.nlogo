@@ -1,4 +1,4 @@
-patches-own [ origColor ]
+patches-own [ origColor ladderPatch ]
 
 to setup
   ca
@@ -17,18 +17,28 @@ end
 to turtle_setup
   set xcor 155
   set ycor 90
-  set size 15
+  set size 60
   set heading 90
-  set shape "car"
 end
 
 to moveRight
-  set xcor xcor + 5
+  set xcor xcor + 3
 end
 
 to moveUp
-  if pcolor > 80 and pcolor < 90
-  [ set ycor ycor + 1 ]
+  if pcolor >= 80
+  [ set heading 0
+    set ycor ycor + 1 ]
+end
+
+to moveLeft
+  set xcor xcor - 3
+end
+
+to moveDown
+  if pcolor >= 80
+  [ set heading 0
+    set ycor ycor - 1 ]
 end
 
 to resetColors
@@ -126,6 +136,40 @@ T
 TURTLE
 NIL
 W
+NIL
+NIL
+1
+
+BUTTON
+31
+209
+114
+242
+NIL
+moveLeft
+NIL
+1
+T
+TURTLE
+NIL
+A
+NIL
+NIL
+1
+
+BUTTON
+35
+272
+128
+305
+NIL
+moveDown
+NIL
+1
+T
+TURTLE
+NIL
+S
 NIL
 NIL
 1
