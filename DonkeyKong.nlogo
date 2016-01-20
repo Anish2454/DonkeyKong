@@ -1,4 +1,5 @@
-patches-own [ origColor ladderPatch ]
+patches-own [ origColor ladderPatch ground? pcord]
+turtles-own [ cord ]
 
 to setup
   ca
@@ -12,12 +13,15 @@ end
 
 to patches_setup
   set origcolor pcolor
+  if shade-of? pcolor magenta 
+    [ set ground? true ]
 end
 
 to turtle_setup
   set xcor 155
   set ycor 90
   set size 60
+  set shape "mario"
   set heading 90
 end
 
@@ -43,6 +47,19 @@ end
 
 to resetColors
   set pcolor origColor
+end
+
+to go
+  goWithGround
+end
+
+to gowithGround
+  ask turtles [
+    ifelse [ground?] of patch-at 0 -2 != true [
+    set cord (([pycor] of patch-at 0 -2) + 1)]
+    [if [ground?] of patch-at 0 2 != true
+      [ set cord (([pycor] of patch-at 0 2) + 1) ] ] ]
+  ask turtles [set ycor cord]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -170,6 +187,23 @@ T
 TURTLE
 NIL
 S
+NIL
+NIL
+1
+
+BUTTON
+145
+103
+208
+136
+NIL
+go
+T
+1
+T
+OBSERVER
+NIL
+NIL
 NIL
 NIL
 1
@@ -377,6 +411,62 @@ true
 0
 Line -7500403 true 150 0 150 150
 
+mario
+false
+0
+Rectangle -2674135 true false 105 15 150 30
+Rectangle -2674135 true false 75 75 105 75
+Rectangle -2674135 true false 90 30 195 45
+Rectangle -13345367 true false 75 45 135 60
+Rectangle -13345367 true false 105 60 120 90
+Rectangle -13345367 true false 120 75 135 90
+Rectangle -6459832 true false 75 60 105 90
+Rectangle -6459832 true false 105 90 90 120
+Rectangle -6459832 true false 90 90 150 120
+Rectangle -6459832 true false 150 105 195 120
+Rectangle -13345367 true false 150 90 210 105
+Rectangle -13345367 true false 165 90 180 105
+Rectangle -13345367 true false 165 75 180 90
+Rectangle -13345367 true false 150 60 165 75
+Rectangle -6459832 true false 150 45 150 90
+Rectangle -6459832 true false 135 45 165 60
+Rectangle -6459832 true false 120 60 150 75
+Rectangle -6459832 true false 135 75 165 90
+Rectangle -6459832 true false 165 60 210 75
+Rectangle -6459832 true false 180 75 225 90
+Rectangle -13345367 true false 75 120 165 135
+Rectangle -13345367 true false 60 135 180 150
+Rectangle -2674135 true false 135 135 135 150
+Rectangle -2674135 true false 120 135 150 180
+Rectangle -2674135 true false 105 150 120 165
+Rectangle -2674135 true false 150 165 165 165
+Rectangle -2674135 true false 180 165 195 210
+Rectangle -1 true false 150 150 150 165
+Rectangle -1 true false 135 150 150 165
+Rectangle -13345367 true false 60 60 75 90
+Rectangle -13345367 true false 60 90 75 105
+Rectangle -13345367 true false 45 90 90 105
+Rectangle -13345367 true false 60 150 75 180
+Rectangle -13345367 true false 75 150 105 165
+Rectangle -13345367 true false 90 165 90 180
+Rectangle -13345367 true false 75 165 120 180
+Rectangle -13345367 true false 75 180 90 195
+Rectangle -6459832 true false 90 180 120 210
+Rectangle -2674135 true false 120 180 135 195
+Rectangle -6459832 true false 135 180 150 195
+Rectangle -6459832 true false 120 180 135 195
+Rectangle -2674135 true false 135 180 150 195
+Rectangle -2674135 true false 60 180 75 225
+Rectangle -2674135 true false 75 195 90 225
+Rectangle -2674135 true false 90 210 120 225
+Rectangle -2674135 true false 120 195 150 210
+Rectangle -2674135 true false 135 210 180 225
+Rectangle -13345367 true false 60 225 105 255
+Rectangle -13345367 true false 105 240 120 255
+Rectangle -13345367 true false 135 225 180 255
+Rectangle -13345367 true false 180 240 195 255
+Rectangle -2674135 true false 150 150 180 210
+
 pentagon
 false
 0
@@ -517,7 +607,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2.1
+NetLogo 5.0.2
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
