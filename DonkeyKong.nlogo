@@ -15,6 +15,8 @@ to patches_setup
   set origcolor pcolor
   if shade-of? pcolor magenta 
     [ set ground? true ]
+  if shade-of? pcolor blue
+    [ set ladderPatch true ]
 end
 
 to turtle_setup
@@ -55,10 +57,12 @@ end
 
 to gowithGround
   ask turtles [
-    ifelse [ground?] of patch-at 0 -2 != true [
-    set cord (([pycor] of patch-at 0 -2) + 1)]
-    [if [ground?] of patch-at 0 2 != true
-      [ set cord (([pycor] of patch-at 0 2) + 1) ] ] ]
+    ; If the patch below you isnt a ground patch,
+    ; 
+    ifelse [ground?] of patch-at 0 -1 != true [
+      set cord (ycor - 1) ]
+      [if [ground?] of patch-at 0 1 != true
+        [ set cord (ycor + 1) ] ] ]
   ask turtles [set ycor cord]
 end
 @#$#@#$#@
