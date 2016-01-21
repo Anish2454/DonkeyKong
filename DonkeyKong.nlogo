@@ -1,5 +1,6 @@
 patches-own [ origColor ladderPatch ground? pcord]
-turtles-own [ cord ]
+turtles-own [ cord velocity ]
+globals [ time timestep acceleration ]
 
 to setup
   ca
@@ -9,6 +10,9 @@ to setup
   ask patches [
     patches_setup ]
   crt 1 [ turtle_setup ]
+  set timestep 1
+  set time 0
+  set acceleration 9.8
 end
 
 to patches_setup
@@ -25,6 +29,7 @@ to turtle_setup
   set size 60
   set shape "mario"
   set heading 90
+  set velocity 0
 end
 
 to moveRight
@@ -32,9 +37,8 @@ to moveRight
 end
 
 to moveUp
-  if pcolor >= 80
-  [ set heading 0
-    set ycor ycor + 1 ]
+  set heading 0
+  set ycor ycor + 1 
 end
 
 to moveLeft
@@ -65,6 +69,42 @@ to gowithGround
         [ set cord (ycor + 1) ] ] ]
   ask turtles [set ycor cord]
 end
+
+to jumpfinal
+  resetTime
+  jumpUp 4
+  resetTime
+  jumpdown 4
+end
+
+to resetTime
+  set time 0
+  ask turtles [
+    set velocity 0
+  ]
+end
+
+to jumpUp [distUp]
+  repeat distUp [
+  set time time + timestep 
+  ask turtles [
+    set ycor ycor + timestep * (velocity + timestep * acceleration / 2)
+    set velocity velocity + timestep * acceleration
+  ]
+  wait 0.05
+  ]
+end
+
+to jumpDown [distDown]
+  repeat distDown [
+  set time time + timestep 
+  ask turtles [
+    set ycor ycor - (timestep * (velocity + timestep * acceleration / 2))
+    set velocity velocity + timestep * acceleration
+  ]
+  wait 0.05
+  ]
+  end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -203,6 +243,23 @@ BUTTON
 NIL
 go
 T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+136
+156
+232
+189
+NIL
+jumpfinal
+NIL
 1
 T
 OBSERVER
