@@ -545,6 +545,68 @@ Rectangle -13345367 true false 135 225 180 255
 Rectangle -13345367 true false 180 240 195 255
 Rectangle -2674135 true false 150 150 180 210
 
+mariojumping
+true
+0
+Rectangle -2674135 true false 90 15 210 30
+Rectangle -2674135 true false 120 0 180 15
+Rectangle -6459832 true false 120 45 150 45
+Rectangle -6459832 true false 120 30 120 45
+Rectangle -6459832 true false 120 30 150 45
+Rectangle -13345367 true false 150 30 210 45
+Rectangle -6459832 true false 75 45 120 60
+Rectangle -6459832 true false 60 60 105 75
+Rectangle -13345367 true false 120 45 135 60
+Rectangle -13345367 true false 105 60 120 75
+Rectangle -13345367 true false 75 75 135 90
+Rectangle -6459832 true false 135 45 165 60
+Rectangle -6459832 true false 120 60 150 75
+Rectangle -6459832 true false 135 75 195 90
+Rectangle -13345367 true false 150 60 180 75
+Rectangle -13345367 true false 165 45 180 60
+Rectangle -6459832 true false 90 90 195 105
+Rectangle -13345367 true false 195 75 240 90
+Rectangle -13345367 true false 210 45 210 75
+Rectangle -13345367 true false 210 45 225 75
+Rectangle -6459832 true false 180 45 210 75
+Rectangle -2674135 true false 150 105 180 135
+Rectangle -13345367 true false 120 105 150 120
+Rectangle -13345367 true false 120 120 120 120
+Rectangle -13345367 true false 90 120 150 135
+Rectangle -13345367 true false 90 105 90 135
+Rectangle -13345367 true false 60 105 75 135
+Rectangle -6459832 true false 30 90 60 120
+Rectangle -6459832 true false 45 105 60 120
+Rectangle -2674135 true false 135 135 150 135
+Rectangle -2674135 true false 135 120 150 195
+Rectangle -1184463 true false 150 150 165 165
+Rectangle -13345367 true false 75 120 90 135
+Rectangle -2674135 true false 150 135 180 150
+Rectangle -2674135 true false 105 135 135 150
+Rectangle -2674135 true false 105 150 150 165
+Rectangle -2674135 true false 75 165 135 195
+Rectangle -2674135 true false 165 150 180 195
+Rectangle -2674135 true false 150 165 165 195
+Rectangle -2674135 true false 180 150 210 210
+Rectangle -2674135 true false 210 180 225 210
+Rectangle -2674135 true false 165 210 180 210
+Rectangle -2674135 true false 165 195 180 210
+Rectangle -2674135 true false 180 210 210 225
+Rectangle -13345367 true false 45 165 75 195
+Rectangle -13345367 true false 45 150 60 165
+Rectangle -13345367 true false 210 165 270 180
+Rectangle -13345367 true false 255 180 270 195
+Rectangle -13345367 true false 270 180 285 195
+Rectangle -13345367 true false 225 150 255 165
+Rectangle -13345367 true false 225 180 240 195
+Rectangle -13345367 true false 180 105 210 150
+Rectangle -13345367 true false 210 105 225 135
+Rectangle -13345367 true false 225 120 240 120
+Rectangle -13345367 true false 225 105 240 120
+Rectangle -6459832 true false 240 90 255 135
+Rectangle -6459832 true false 240 90 270 120
+Rectangle -6459832 true false 270 105 285 120
+
 pentagon
 false
 0
