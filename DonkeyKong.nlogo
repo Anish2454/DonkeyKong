@@ -1,9 +1,11 @@
 patches-own [ origColor ladderPatch ground? pcord]
 breed [ barrels barrel ]
 breed [ marios mario ]
-marios-own [ cord velocity ]
+marios-own [ cord velocity withground?]
 globals [ time barreltime timestep acceleration ]
 
+
+; ------------------------------ SETUP --------------------------------
 to setup
   importMap
   ask patches 
@@ -31,55 +33,36 @@ to patches_setup
   if shade-of? pcolor magenta 
     [ set ground? true ]
   if shade-of? pcolor blue
-    [ set ladderPatch true ]
+    [ set ladderPatch true
+      ask patches in-radius 10
+        [ set ladderPatch true ]]
 end
 
 to mario_setup
   set xcor 155
-  set ycor 90
+  set ycor 95
   set size 60
   set shape "mario"
   set heading 90
   set velocity 0
 end
+; -----------------------------------------------------------------------
 
-to moveRight
-  ask marios [
-  set xcor xcor + 3 ]
-end
-
-to moveUp
-  ask marios [
-  set heading 0
-  set ycor ycor + 1 ]
-end
-
-to moveLeft
-  ask marios [
-  set xcor xcor - 3 ]
-end
-
-to moveDown
-  ask marios [
-  if pcolor >= 80
-  [ set heading 0
-    set ycor ycor - 1 ] ]
-end
 
 to go
-  ; goWithGround
+  goWithGround
   ; createBarrelsPeriodically
 end
 
 to gowithGround
   ask marios [
-    ; If the patch below you isnt a ground patch,
-    ; 
-    ifelse [ground?] of patch-at 0 -1 != true [
-      set cord (ycor - 1) ]
-      [if [ground?] of patch-at 0 1 != true
-        [ set cord (ycor + 1) ] ] ]
-  ask marios [set ycor cord]
+  ifelse ladderPatch != true 
+    [ ifelse ground? != true 
+       [while [[ground?] of patch-at 0 -20 != true ] 
+         [ set ycor ycor - 1]]
+       [while [[ground?] of patch-at 0 20 != true ] 
+         [ set ycor ycor + 1]]]
+    [ ]]
 end
 
 to createBarrelsPeriodically
@@ -126,6 +109,31 @@ to jumpDown [distDown]
   ]
   wait 0.05
   ]
+end
+; -------------------------------------------------------------------------
+
+
+; -------------------------- Functions For Movement --------------------------
+to moveRight
+  ask marios [
+  set xcor xcor + 3 ]
+end
+
+to moveUp
+  ask marios [
+  set heading 0
+  set ycor ycor + 1 ]
+end
+
+to moveLeft
+  ask marios [
+  set xcor xcor - 3 ]
+end
+
+to moveDown
+  ask marios [
+    set heading 0
+    set ycor ycor - 1 ]
 end
 to marioreset
    ask mario 0 [set xcor 155
