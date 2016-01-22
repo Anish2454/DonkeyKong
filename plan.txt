@@ -1,1 +1,15 @@
 PLAN
+
+Setup function: 
+  - imports map and creates mario
+  - charqacter models
+  
+Go function:
+  -makes sure that mario walks along the platform
+  -jumping function
+  -create barrels
+  -barrels falling
+
+Animations:
+  - Change shapes of mario based on what he's doing
+  - 
