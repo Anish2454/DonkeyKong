@@ -127,6 +127,10 @@ to jumpDown [distDown]
   wait 0.05
   ]
 end
+to marioreset
+   ask mario 0 [set xcor 155
+  set ycor 90]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
