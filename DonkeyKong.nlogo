@@ -5,16 +5,25 @@ marios-own [ cord velocity ]
 globals [ time barreltime timestep acceleration ]
 
 to setup
+  importMap
+  ask patches 
+    [ patches_setup ]
+  create-marios 1 
+    [ mario_setup ]
+  setupPhysics
+end
+
+to setupPhysics
+  set timestep 1
+  set time 0
+  set acceleration 9.8
+end
+
+to importMap
   ca
   resize-world 0 700 0 700
   set-patch-size 1
   import-pcolors "donkeykong1.jpg"
-  ask patches [
-    patches_setup ]
-  create-marios 1 [ mario_setup ]
-  set timestep 1
-  set time 0
-  set acceleration 9.8
 end
 
 to patches_setup
@@ -84,13 +93,13 @@ end
 
 ; --------------------- JUMP FUNCTIONS (VARLET ALGORITHM) -----------------------
 to jumpfinal
-  resetTime
+  resetPhysics
   jumpUp 4
-  resetTime
+  resetPhysics
   jumpdown 4
 end
 
-to resetTime
+to resetPhysics
   set time 0
   ask marios [
     set velocity 0
