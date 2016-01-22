@@ -1,6 +1,8 @@
 patches-own [ origColor ladderPatch ground? pcord]
-turtles-own [ cord velocity ]
-globals [ time timestep acceleration ]
+breed [ barrels barrel ]
+breed [ marios mario ]
+marios-own [ cord velocity ]
+globals [ time barreltime timestep acceleration ]
 
 to setup
   ca
@@ -9,7 +11,7 @@ to setup
   import-pcolors "donkeykong1.jpg"
   ask patches [
     patches_setup ]
-  crt 1 [ turtle_setup ]
+  create-marios 1 [ mario_setup ]
   set timestep 1
   set time 0
   set acceleration 9.8
@@ -23,7 +25,7 @@ to patches_setup
     [ set ladderPatch true ]
 end
 
-to turtle_setup
+to mario_setup
   set xcor 155
   set ycor 90
   set size 60
@@ -33,43 +35,54 @@ to turtle_setup
 end
 
 to moveRight
-  set xcor xcor + 3
+  ask marios [
+  set xcor xcor + 3 ]
 end
 
 to moveUp
+  ask marios [
   set heading 0
-  set ycor ycor + 1 
+  set ycor ycor + 1 ]
 end
 
 to moveLeft
-  set xcor xcor - 3
+  ask marios [
+  set xcor xcor - 3 ]
 end
 
 to moveDown
+  ask marios [
   if pcolor >= 80
   [ set heading 0
-    set ycor ycor - 1 ]
-end
-
-to resetColors
-  set pcolor origColor
+    set ycor ycor - 1 ] ]
 end
 
 to go
-  goWithGround
+  ; goWithGround
+  ; createBarrelsPeriodically
 end
 
 to gowithGround
-  ask turtles [
+  ask marios [
     ; If the patch below you isnt a ground patch,
     ; 
     ifelse [ground?] of patch-at 0 -1 != true [
       set cord (ycor - 1) ]
       [if [ground?] of patch-at 0 1 != true
         [ set cord (ycor + 1) ] ] ]
-  ask turtles [set ycor cord]
+  ask marios [set ycor cord]
 end
 
+to createBarrelsPeriodically
+  set barreltime barreltime + timestep
+  if barreltime mod 5 = 0
+    [ create-barrels 1 [
+        setxy 0 0
+        set size 10 ]
+    ]
+end
+
+; --------------------- JUMP FUNCTIONS (VARLET ALGORITHM) -----------------------
 to jumpfinal
   resetTime
   jumpUp 4
@@ -79,7 +92,7 @@ end
 
 to resetTime
   set time 0
-  ask turtles [
+  ask marios [
     set velocity 0
   ]
 end
@@ -87,7 +100,7 @@ end
 to jumpUp [distUp]
   repeat distUp [
   set time time + timestep 
-  ask turtles [
+  ask marios [
     set ycor ycor + timestep * (velocity + timestep * acceleration / 2)
     set velocity velocity + timestep * acceleration
   ]
@@ -98,13 +111,13 @@ end
 to jumpDown [distDown]
   repeat distDown [
   set time time + timestep 
-  ask turtles [
+  ask marios [
     set ycor ycor - (timestep * (velocity + timestep * acceleration / 2))
     set velocity velocity + timestep * acceleration
   ]
   wait 0.05
   ]
-  end
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -160,26 +173,9 @@ moveRight
 NIL
 1
 T
-TURTLE
+OBSERVER
 NIL
 D
-NIL
-NIL
-1
-
-BUTTON
-105
-43
-200
-76
-NIL
-resetColors\n\n
-NIL
-1
-T
-PATCH
-NIL
-NIL
 NIL
 NIL
 1
@@ -194,7 +190,7 @@ moveUp\n
 NIL
 1
 T
-TURTLE
+OBSERVER
 NIL
 W
 NIL
@@ -211,7 +207,7 @@ moveLeft
 NIL
 1
 T
-TURTLE
+OBSERVER
 NIL
 A
 NIL
@@ -228,7 +224,7 @@ moveDown
 NIL
 1
 T
-TURTLE
+OBSERVER
 NIL
 S
 NIL
@@ -253,10 +249,10 @@ NIL
 1
 
 BUTTON
-136
-156
-232
-189
+114
+154
+210
+187
 NIL
 jumpfinal
 NIL
