@@ -2,15 +2,16 @@ patches-own [ origColor ladderPatch ground? pcord]
 breed [ barrels barrel ]
 breed [ marios mario ]
 marios-own [ cord velocity withground?]
-globals [ time barreltime timestep acceleration ]
+barrels-own [ withground? ]
+globals [ time timestep acceleration ]
 
 
 ; ------------------------------ SETUP --------------------------------
 to setup
   importMap
-  ask patches 
+  ask patches
     [ patches_setup ]
-  create-marios 1 
+  create-marios 1
     [ mario_setup ]
   setupPhysics
 end
@@ -30,7 +31,7 @@ end
 
 to patches_setup
   set origcolor pcolor
-  if shade-of? pcolor magenta 
+  if shade-of? pcolor magenta
     [ set ground? true ]
   if shade-of? pcolor blue
     [ set ladderPatch true
@@ -50,48 +51,39 @@ end
 
 
 to go
-  goWithGround
-  ; createBarrelsPeriodically
+  set time time + timestep
+  goWithGroundMario
 end
 
-to gowithGround
+to gowithGroundMario
   ask marios [
-  ifelse ladderPatch != true 
-    [ ifelse ground? != true 
-       [while [[ground?] of patch-at 0 -20 != true ] 
+  ifelse ladderPatch != true
+    [ ifelse ground? != true
+       [while [[ground?] of patch-at 0 -20 != true ]
          [ set ycor ycor - 1]]
-       [while [[ground?] of patch-at 0 20 != true ] 
+       [while [[ground?] of patch-at 0 20 != true ]
          [ set ycor ycor + 1]]]
     [ ]]
 end
 
-to createBarrelsPeriodically
-  set barreltime barreltime + timestep
-  if barreltime mod 5 = 0
-    [ create-barrels 1 [
-        setxy 0 0
-        set size 10 ]
-    ]
-end
-
 ; --------------------- JUMP FUNCTIONS (VARLET ALGORITHM) -----------------------
 to jumpfinal
+  ask marios [ set shape "mariojumping"]
   resetPhysics
   jumpUp 4
   resetPhysics
   jumpdown 4
+  ask marios [ set shape "mario"]
 end
 
 to resetPhysics
-  set time 0
   ask marios [
     set velocity 0
   ]
 end
 
-to jumpUp [distUp]
-  repeat distUp [
-  set time time + timestep 
+to jumpUp [dist]
+  repeat dist [
   ask marios [
     set ycor ycor + timestep * (velocity + timestep * acceleration / 2)
     set velocity velocity + timestep * acceleration
@@ -100,9 +92,8 @@ to jumpUp [distUp]
   ]
 end
 
-to jumpDown [distDown]
-  repeat distDown [
-  set time time + timestep 
+to jumpDown [dist]
+  repeat dist [
   ask marios [
     set ycor ycor - (timestep * (velocity + timestep * acceleration / 2))
     set velocity velocity + timestep * acceleration
@@ -136,7 +127,7 @@ to moveDown
     set ycor ycor - 1 ]
 end
 to marioreset
-   ask mario 0 [set xcor 155
+  ask marios [set xcor 155
   set ycor 90]
 end
 @#$#@#$#@
@@ -276,6 +267,23 @@ BUTTON
 187
 NIL
 jumpfinal
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+118
+43
+208
+76
+NIL
+marioreset\n
 NIL
 1
 T
@@ -571,7 +579,6 @@ Rectangle -13345367 true false 210 45 225 75
 Rectangle -6459832 true false 180 45 210 75
 Rectangle -2674135 true false 150 105 180 135
 Rectangle -13345367 true false 120 105 150 120
-Rectangle -13345367 true false 120 120 120 120
 Rectangle -13345367 true false 90 120 150 135
 Rectangle -13345367 true false 90 105 90 135
 Rectangle -13345367 true false 60 105 75 135
@@ -747,7 +754,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.0.2
+NetLogo 5.2.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
