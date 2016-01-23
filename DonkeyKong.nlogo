@@ -1,9 +1,9 @@
 patches-own [ origColor ladderPatch ground? pcord]
 breed [ barrels barrel ]
 breed [ marios mario ]
-marios-own [ cord velocity withground?]
-barrels-own [ withground? ]
-globals [ time timestep acceleration ]
+marios-own [ cord velocityX velocityY withground?]
+barrels-own [ withground? direction]
+globals [ time timestep accelerationY accelerationX ]
 
 
 ; ------------------------------ SETUP --------------------------------
@@ -13,13 +13,16 @@ to setup
     [ patches_setup ]
   create-marios 1
     [ mario_setup ]
+  create-barrels 1
+    [ barrelSetup ]
   setupPhysics
 end
 
 to setupPhysics
   set timestep 1
   set time 0
-  set acceleration 9.8
+  set accelerationY 9.8
+  set accelerationX 2.5
 end
 
 to importMap
@@ -31,7 +34,7 @@ end
 
 to patches_setup
   set origcolor pcolor
-  if shade-of? pcolor magenta
+  if shade-of? pcolor orange or shade-of? pcolor red
     [ set ground? true ]
   if shade-of? pcolor blue
     [ set ladderPatch true
@@ -45,69 +48,87 @@ to mario_setup
   set size 60
   set shape "mario"
   set heading 90
-  set velocity 0
+  set velocityY 0
+  set velocityX 0
+end
+
+to barrelSetup
+  setxy 198 530
+  set size 60
+  set shape "car"
+  set color blue
+  set direction 1
 end
 ; -----------------------------------------------------------------------
 
 
 to go
-  set time time + timestep
   goWithGroundMario
+  goWithGroundBarrel
 end
 
 to gowithGroundMario
   ask marios [
   ifelse ladderPatch != true
-    [ ifelse ground? != true
-       [while [[ground?] of patch-at 0 -20 != true ]
-         [ set ycor ycor - 1]]
-       [while [[ground?] of patch-at 0 20 != true ]
-         [ set ycor ycor + 1]]]
+    [ gravity ]
     [ ]]
+end
+
+
+to gowithGroundBarrel
+  ask barrels [
+      gravity
+      wait .01
+      if xcor = 647 or xcor = 61
+        [set direction direction * -1]
+      set xcor xcor + direction]
+
+end
+
+to gravity
+  ifelse [ground?] of patch-at 0 -19 != true
+    [while [[ground?] of patch-at 0 -20 != true ]
+       [ set ycor ycor - 1]]
+    [while [[ground?] of patch-at 0 20 != true ]
+       [ set ycor ycor + 1]]
 end
 
 ; --------------------- JUMP FUNCTIONS (VARLET ALGORITHM) -----------------------
 to jumpfinal
   ask marios [ set shape "mariojumping"]
-  resetPhysics
-  jumpUp 4
-  resetPhysics
-  jumpdown 4
-  ask marios [ set shape "mario"]
+  resetPhysicsY
+  jumpMario 4 1
+  resetPhysicsY
+  jumpMario 4 -1
+  ask marios [ set shape "mario"
+               set velocityX 0 ]
 end
 
-to resetPhysics
+to resetPhysicsY
   ask marios [
-    set velocity 0
+    set velocityY 0
   ]
 end
 
-to jumpUp [dist]
+to jumpMario [dist directionJump]
+  ask marios [
   repeat dist [
-  ask marios [
-    set ycor ycor + timestep * (velocity + timestep * acceleration / 2)
-    set velocity velocity + timestep * acceleration
-  ]
-  wait 0.05
-  ]
+        set ycor ycor + directionJump * (timestep * (velocityY + timestep * accelerationY / 2))
+        set xcor xcor + (timestep * (velocityX + timestep * accelerationX / 2))
+        set velocityY velocityY + timestep * accelerationY
+        set velocityX velocityX + timestep * accelerationX
+        wait 0.05 ]
+    ]
 end
 
-to jumpDown [dist]
-  repeat dist [
-  ask marios [
-    set ycor ycor - (timestep * (velocity + timestep * acceleration / 2))
-    set velocity velocity + timestep * acceleration
-  ]
-  wait 0.05
-  ]
-end
 ; -------------------------------------------------------------------------
 
 
 ; -------------------------- Functions For Movement --------------------------
 to moveRight
   ask marios [
-  set xcor xcor + 3 ]
+    set heading 90
+    set xcor xcor + 3 ]
 end
 
 to moveUp
@@ -118,7 +139,8 @@ end
 
 to moveLeft
   ask marios [
-  set xcor xcor - 3 ]
+    set heading -90
+    set xcor xcor - 3 ]
 end
 
 to moveDown
@@ -126,9 +148,15 @@ to moveDown
     set heading 0
     set ycor ycor - 1 ]
 end
+; ----------------------------------------------------------------------------------
 to marioreset
-  ask marios [set xcor 155
-  set ycor 90]
+  ask marios [
+    set xcor 155
+    set ycor 90]
+  ask barrels [
+    setxy 198 530
+    set direction 1
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
