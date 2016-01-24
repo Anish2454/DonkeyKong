@@ -1,19 +1,33 @@
-patches-own [ origColor ladderPatch ground? pcord]
+patches-own [ origColor ladderPatch ground? pcord og]
 breed [ barrels barrel ]
 breed [ marios mario ]
 marios-own [ cord velocity withground?]
 barrels-own [ withground? direction]
-globals [timestep acceleration ]
+globals [timestep acceleration lives score]
 
 
 ; ------------------------------ SETUP --------------------------------
-to setup
+
+to startscreensetup
+  ca
+   resize-world 0 700 0 700
+  set-patch-size 1
+  import-pcolors "insertcoin.jpg"
+ end
+to flash
+  set og pcolor
+  set pcolor black
+  set pcolor og
+end
+to insertcoin
   importMap
   ask patches
     [ patches_setup ]
   create-marios 1
     [ mario_setup ]
   setupPhysics
+  set lives 3
+  set score 0
 end
 
 to setupPhysics
@@ -65,6 +79,8 @@ to go
       barrelSetup ] ]
   checkForDeathBarrels
   checkForDeathMario
+    if lives = 0 [deathscreen]
+    score1
 end
 
 to gowithGroundMario
@@ -106,14 +122,16 @@ end
 
 to checkForDeathMario
   ask marios [
-    if any? barrels-here [
-      die ]
+    if any? barrels in-radius 1 [
+      deathanimation
+      set lives lives - 1 ]
   ]
 end
 
 ; --------------------- JUMP FUNCTIONS (VARLET ALGORITHM) -----------------------
 to jumpfinal
-  ask marios [ set shape "mariojumping"]
+  ask marios [ set shape "mariojumping"
+    set heading 0]
   resetPhysics
   jumpMario 4 1
   resetPhysics
@@ -188,6 +206,22 @@ to marioreset
     set direction 1
   ]
 end
+to deathanimation
+  ask marios [set shape "ripmario"]
+  wait 0.1
+  ask barrels [die]
+  marioreset
+  end
+to deathscreen
+  ca
+  import-pcolors "gameover.gif"
+end
+to score1
+  ask marios [
+    if any? barrels in-radius 70
+    [set score score + 100]
+    ]
+  end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -219,10 +253,10 @@ ticks
 BUTTON
 23
 40
-86
+108
 73
 NIL
-setup\n
+insertcoin\n
 NIL
 1
 T
@@ -351,6 +385,62 @@ NIL
 NIL
 NIL
 1
+
+BUTTON
+42
+342
+137
+375
+startscreen
+startscreensetup
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+144
+277
+207
+310
+flash
+flash
+T
+1
+T
+PATCH
+NIL
+NIL
+NIL
+NIL
+1
+
+MONITOR
+84
+457
+141
+502
+lives
+lives
+17
+1
+11
+
+MONITOR
+119
+405
+176
+450
+score
+score
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
