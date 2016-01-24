@@ -1,9 +1,9 @@
 patches-own [ origColor ladderPatch ground? pcord]
 breed [ barrels barrel ]
 breed [ marios mario ]
-marios-own [ cord velocityX velocityY withground?]
+marios-own [ cord velocity withground?]
 barrels-own [ withground? direction]
-globals [ time timestep accelerationY accelerationX ]
+globals [timestep acceleration ]
 
 
 ; ------------------------------ SETUP --------------------------------
@@ -13,16 +13,12 @@ to setup
     [ patches_setup ]
   create-marios 1
     [ mario_setup ]
-  create-barrels 1
-    [ barrelSetup ]
   setupPhysics
 end
 
 to setupPhysics
   set timestep 1
-  set time 0
-  set accelerationY 9.8
-  set accelerationX 2.5
+  set acceleration 12
 end
 
 to importMap
@@ -44,18 +40,17 @@ end
 
 to mario_setup
   set xcor 155
-  set ycor 95
+  set ycor 90
   set size 60
   set shape "mario"
   set heading 90
-  set velocityY 0
-  set velocityX 0
+  set velocity 0
 end
 
 to barrelSetup
   setxy 198 530
   set size 60
-  set shape "car"
+  set shape "barrel"
   set color blue
   set direction 1
 end
@@ -65,60 +60,86 @@ end
 to go
   goWithGroundMario
   goWithGroundBarrel
+  every 10 [
+    create-barrels 1 [
+      barrelSetup ] ]
+  checkForDeathBarrels
+  checkForDeathMario
 end
 
 to gowithGroundMario
   ask marios [
-  ifelse ladderPatch != true
-    [ gravity ]
-    [ ]]
+  if ladderPatch != true
+    [ gravity ] ]
 end
 
 
 to gowithGroundBarrel
-  ask barrels [
-      gravity
-      wait .01
-      if xcor = 647 or xcor = 61
-        [set direction direction * -1]
-      set xcor xcor + direction]
+  ask barrels
+    [gravity]
+  wait 0.0035
+  ask barrels
+    [moveBarrels 1]
+end
 
+to moveBarrels [speed]
+  if xcor >= 647 or xcor <= 61
+        [set direction direction * -1
+          set xcor xcor + (direction * 10) ]
+  set xcor xcor + (direction * speed)
 end
 
 to gravity
   ifelse [ground?] of patch-at 0 -19 != true
-    [while [[ground?] of patch-at 0 -20 != true ]
+    [if [ground?] of patch-at 0 -20 != true
        [ set ycor ycor - 1]]
-    [while [[ground?] of patch-at 0 20 != true ]
+    [if [ground?] of patch-at 0 20 != true
        [ set ycor ycor + 1]]
+end
+
+to checkForDeathBarrels
+  ask barrels [
+    if xcor < 110 and ycor < 100
+      [ die ]
+  ]
+end
+
+to checkForDeathMario
+  ask marios [
+    if any? barrels-here [
+      die ]
+  ]
 end
 
 ; --------------------- JUMP FUNCTIONS (VARLET ALGORITHM) -----------------------
 to jumpfinal
   ask marios [ set shape "mariojumping"]
-  resetPhysicsY
+  resetPhysics
   jumpMario 4 1
-  resetPhysicsY
+  resetPhysics
   jumpMario 4 -1
-  ask marios [ set shape "mario"
-               set velocityX 0 ]
+  ask marios [ set shape "mario"]
 end
 
-to resetPhysicsY
+to resetPhysics
   ask marios [
-    set velocityY 0
+    set velocity 0
   ]
 end
 
-to jumpMario [dist directionJump]
+to jumpMario [dist directionJump ]
   ask marios [
   repeat dist [
-        set ycor ycor + directionJump * (timestep * (velocityY + timestep * accelerationY / 2))
-        set xcor xcor + (timestep * (velocityX + timestep * accelerationX / 2))
-        set velocityY velocityY + timestep * accelerationY
-        set velocityX velocityX + timestep * accelerationX
-        wait 0.05 ]
+    checkForDeathMario
+        set ycor ycor + directionJump * (timestep * (velocity + timestep * acceleration / 2))
+        set velocity velocity + timestep * acceleration
+        ask barrels [
+          ifelse xcor > 645 or xcor < 71
+          [ moveBarrels 1]
+          [ moveBarrels 14]]
+        wait 0.08]
     ]
+
 end
 
 ; -------------------------------------------------------------------------
@@ -127,27 +148,36 @@ end
 ; -------------------------- Functions For Movement --------------------------
 to moveRight
   ask marios [
-    set heading 90
-    set xcor xcor + 3 ]
+    checkForDeathMario
+    set shape "runningmarioright"
+    set heading 0
+    set xcor xcor + 3]
 end
 
 to moveUp
   ask marios [
+    checkForDeathMario
+  set shape "climbingmario"
   set heading 0
-  set ycor ycor + 1 ]
+  set ycor ycor + 1]
 end
 
 to moveLeft
   ask marios [
-    set heading -90
+    checkForDeathMario
+    set shape "runningmarioleft"
+    set heading 0
     set xcor xcor - 3 ]
 end
 
 to moveDown
   ask marios [
+    checkForDeathMario
+    set shape "climbingmario"
     set heading 0
-    set ycor ycor - 1 ]
+    set ycor ycor - 1]
 end
+
 ; ----------------------------------------------------------------------------------
 to marioreset
   ask marios [
@@ -778,7 +808,51 @@ Rectangle -6459832 true false 180 180 210 195
 Rectangle -6459832 true false 180 135 195 180
 Rectangle -13345367 true false 165 135 180 150
 
-runningmario
+runningmarioleft
+true
+0
+Rectangle -13345367 true false 90 255 150 270
+Rectangle -13345367 true false 105 240 150 255
+Rectangle -2674135 true false 90 225 135 240
+Rectangle -2674135 true false 165 255 225 240
+Rectangle -2674135 true false 165 225 225 240
+Rectangle -13345367 true false 225 240 225 255
+Rectangle -13345367 true false 240 195 255 255
+Rectangle -13345367 true false 225 195 240 240
+Rectangle -2674135 true false 90 195 225 225
+Rectangle -2674135 true false 75 195 90 225
+Rectangle -2674135 true false 180 180 210 195
+Rectangle -6459832 true false 210 180 210 195
+Rectangle -6459832 true false 210 180 240 195
+Rectangle -6459832 true false 210 165 225 180
+Rectangle -13345367 true false 105 180 180 195
+Rectangle -6459832 true false 75 165 105 195
+Rectangle -6459832 true false 60 165 75 180
+Rectangle -13345367 true false 105 165 195 180
+Rectangle -13345367 true false 120 150 210 180
+Rectangle -2674135 true false 105 150 120 165
+Rectangle -6459832 true false 75 150 90 165
+Rectangle -6459832 true false 60 135 180 150
+Rectangle -6459832 true false 120 120 180 135
+Rectangle -13345367 true false 45 120 120 135
+Rectangle -13345367 true false 90 105 105 120
+Rectangle -13345367 true false 105 90 120 105
+Rectangle -6459832 true false 120 90 180 120
+Rectangle -6459832 true false 105 105 120 120
+Rectangle -6459832 true false 165 90 195 120
+Rectangle -13345367 true false 180 120 225 135
+Rectangle -13345367 true false 195 90 210 120
+Rectangle -13345367 true false 150 75 165 120
+Rectangle -13345367 true false 135 105 150 120
+Rectangle -6459832 true false 135 75 150 90
+Rectangle -6459832 true false 30 105 90 120
+Rectangle -6459832 true false 45 90 105 105
+Rectangle -6459832 true false 105 75 135 90
+Rectangle -13345367 true false 135 75 210 90
+Rectangle -2674135 true false 75 60 210 75
+Rectangle -2674135 true false 120 45 195 60
+
+runningmarioright
 true
 0
 Rectangle -13345367 true false 150 255 210 270
