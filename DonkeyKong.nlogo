@@ -10,15 +10,18 @@ globals [timestep acceleration lives score]
 
 to startscreensetup
   ca
-   resize-world 0 700 0 700
+  resize-world 0 700 0 700
   set-patch-size 1
   import-pcolors "insertcoin.jpg"
  end
+
 to flash
   set og pcolor
   set pcolor black
+  wait .1
   set pcolor og
 end
+
 to insertcoin
   importMap
   ask patches
@@ -48,7 +51,7 @@ to patches_setup
     [ set ground? true ]
   if shade-of? pcolor blue
     [ set ladderPatch true
-      ask patches in-radius 10
+      ask patches in-radius 15
         [ set ladderPatch true ]]
 end
 
@@ -64,6 +67,7 @@ end
 to barrelSetup
   setxy 198 530
   set size 60
+  set heading 0
   set shape "barrel"
   set color blue
   set direction 1
@@ -72,21 +76,22 @@ end
 
 
 to go
+  checkForDeathMario
   goWithGroundMario
   goWithGroundBarrel
   every 10 [
     create-barrels 1 [
       barrelSetup ] ]
   checkForDeathBarrels
-  checkForDeathMario
     if lives = 0 [deathscreen]
-    score1
+  score1
 end
 
 to gowithGroundMario
   ask marios [
-  if ladderPatch != true
-    [ gravity ] ]
+    checkForDeathMario
+    if ladderPatch != true
+      [ gravity ] ]
 end
 
 
@@ -122,7 +127,7 @@ end
 
 to checkForDeathMario
   ask marios [
-    if any? barrels in-radius 1 [
+    if any? barrels in-radius 15 [
       deathanimation
       set lives lives - 1 ]
   ]
@@ -148,7 +153,7 @@ end
 to jumpMario [dist directionJump ]
   ask marios [
   repeat dist [
-    checkForDeathMario
+    ;checkForDeathMario
         set ycor ycor + directionJump * (timestep * (velocity + timestep * acceleration / 2))
         set velocity velocity + timestep * acceleration
         ask barrels [
@@ -166,7 +171,7 @@ end
 ; -------------------------- Functions For Movement --------------------------
 to moveRight
   ask marios [
-    checkForDeathMario
+    ;checkForDeathMario
     set shape "runningmarioright"
     set heading 0
     set xcor xcor + 3]
@@ -174,7 +179,7 @@ end
 
 to moveUp
   ask marios [
-    checkForDeathMario
+    ;checkForDeathMario
   set shape "climbingmario"
   set heading 0
   set ycor ycor + 1]
@@ -182,7 +187,7 @@ end
 
 to moveLeft
   ask marios [
-    checkForDeathMario
+    ;checkForDeathMario
     set shape "runningmarioleft"
     set heading 0
     set xcor xcor - 3 ]
@@ -190,7 +195,7 @@ end
 
 to moveDown
   ask marios [
-    checkForDeathMario
+    ;checkForDeathMario
     set shape "climbingmario"
     set heading 0
     set ycor ycor - 1]
@@ -206,22 +211,25 @@ to marioreset
     set direction 1
   ]
 end
+
 to deathanimation
   ask marios [set shape "ripmario"]
   wait 0.1
   ask barrels [die]
   marioreset
-  end
+end
+
 to deathscreen
   ca
   import-pcolors "gameover.gif"
 end
+
 to score1
   ask marios [
     if any? barrels in-radius 70
     [set score score + 100]
     ]
-  end
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -251,10 +259,10 @@ ticks
 30.0
 
 BUTTON
-23
-40
-108
-73
+21
+44
+106
+77
 NIL
 insertcoin\n
 NIL
@@ -268,10 +276,10 @@ NIL
 1
 
 BUTTON
-30
-100
-120
-133
+144
+144
+208
+177
 NIL
 moveRight
 NIL
@@ -285,10 +293,10 @@ NIL
 1
 
 BUTTON
-29
-154
-106
-187
+68
+110
+145
+143
 NIL
 moveUp\n
 NIL
@@ -302,10 +310,10 @@ NIL
 1
 
 BUTTON
-31
-209
-114
-242
+2
+143
+69
+176
 NIL
 moveLeft
 NIL
@@ -319,10 +327,10 @@ NIL
 1
 
 BUTTON
-35
-272
-128
-305
+69
+143
+144
+176
 NIL
 moveDown
 NIL
@@ -336,10 +344,10 @@ NIL
 1
 
 BUTTON
-145
-103
-208
-136
+106
+44
+185
+77
 NIL
 go
 T
@@ -353,10 +361,10 @@ NIL
 1
 
 BUTTON
-114
-154
-210
-187
+59
+195
+155
+228
 NIL
 jumpfinal
 NIL
@@ -370,10 +378,10 @@ NIL
 1
 
 BUTTON
-118
-43
-208
-76
+77
+364
+167
+397
 NIL
 marioreset\n
 NIL
@@ -387,11 +395,11 @@ NIL
 1
 
 BUTTON
-42
-342
-137
-375
-startscreen
+57
+10
+152
+43
+ SETUP
 startscreensetup
 NIL
 1
@@ -403,40 +411,23 @@ NIL
 NIL
 1
 
-BUTTON
-144
-277
-207
-310
-flash
-flash
-T
-1
-T
-PATCH
-NIL
-NIL
-NIL
-NIL
-1
-
 MONITOR
-84
-457
-141
-502
-lives
-lives
+1
+303
+208
+348
+                            LIVES
+LIVES
 17
 1
 11
 
 MONITOR
-119
-405
-176
-450
-score
+1
+258
+209
+303
+                           SCORE
 score
 17
 1
