@@ -38,8 +38,8 @@ to insertcoin; brings all the set up functions together
 end
 
 to setupPhysics
-  set timestep 1
-  set acceleration 12
+  set timestep 1 ;sets timedelta to 1s
+  set acceleration 12 ; sets acceleration to 12 patches/sec^2
 end
 
 to importMap;imports main world map
@@ -52,10 +52,10 @@ to patches_setup; sets up certain patches to be true which helps in the later pa
   set origcolor pcolor
   if shade-of? pcolor orange or shade-of? pcolor red
     [ set ground? true
-      set ladderPatch? true ]
+      set ladderPatch? true ] ; The platform is also a ladderpatch bc Mario needs to be able to climb it
   if shade-of? pcolor blue
     [ set ladderPatch? true
-      ask patches in-radius 15
+      ask patches in-radius 15 ; Takes care of patches inside the ladder as they are not blue
         [ set ladderPatch? true ]]
 end
 
@@ -65,22 +65,21 @@ to mario_setup;sets up mario
   set size 60
   set shape "mario"
   set heading 90
-  set velocity 0
+  set velocity 0 ;Velocity for jumping
 end
 
-to barrelSetup;spawns barrels
+to barrelSetup ;spawns barrels
   setxy 198 530
   set size 60
   set heading 0
   set shape "barrel"
-  set color blue
   set direction 1
 end
 ; -----------------------------------------------------------------------
 
 
 to go;main go function. This makes everything work together and starts the game
-  ifelse any? Marios with [ xcor < 377 and ycor > 580]
+  ifelse any? Marios with [ xcor < 377 and ycor > 580] ; If mario has won, then go to the winscreen
     [ winscreen ]
     [ checkForDeathMario
       goWithGroundMario
@@ -114,14 +113,18 @@ to gowithGroundBarrel; makes sure barrels go along the platforms
     [moveBarrels 1]
 end
 
-to moveBarrels [speed]; makes the barrels move and how fast they move
+to moveBarrels [speed]; makes the barrels move speed determines how fast they move
   if xcor >= 645 or xcor <= 55
         [set direction direction * -1
           set xcor xcor + (direction * 10) ]
   set xcor xcor + (direction * speed)
 end
 
-to gravity
+; If the patch directly beneath you is not a “ground patch” (a patch that is part of the red platform), 
+; then repeatedly set your ycor one less until this condition is met. If however the patch above your 
+; feet is a ground patch (you’ve “sunken” into the platform) then set your ycor to one more until you 
+; are above the platform. This is run constantly to ensure that mario is always above the platform
+to gravity 
   ifelse [ground?] of patch-at 0 -19 != true
     [if [ground?] of patch-at 0 -20 != true
        [ set ycor ycor - 1]]
@@ -144,14 +147,14 @@ to checkForDeathMario; kills mario when he comes in contact with a barrel
   ]
 end
 
-; --------------------- JUMP FUNCTIONS (VARLET ALGORITHM) -----------------------
+; --------------------- JUMP FUNCTIONS (VERLET ALGORITHM) -----------------------
 to jumpfinal; controls marios jumping
   ask marios [ set shape "mariojumping"
     set heading 0]
-  resetPhysics
+  resetPhysics ; sets velocity to 0 bc velocity is 0 at the apex of a jump
   jumpMario 4 1
   resetPhysics
-  jumpMario 4 -1
+  jumpMario 4 -1 ;reverse direction (fall down)
   ask marios [ set shape "mario"]
 end
 
@@ -164,10 +167,14 @@ end
 to jumpMario [dist directionJump ]
   ask marios [
   repeat dist [
-        checkForDeathMario
-        set ycor ycor + directionJump * (timestep * (velocity + timestep * acceleration / 2));varely algorithm
+        checkForDeathMario ; This is here in case mario runs into a barrel while jumping
+        ; Verlet Algorithm
+        set ycor ycor + directionJump * (timestep * (velocity + timestep * acceleration / 2))
         set velocity velocity + timestep * acceleration
         ask barrels [
+        ; This code is here so that the barrels keep moving even while mario is jumping
+        ; Bc of the wait, all agents are paused while mario jumps
+        ; This is a workaround
           ifelse xcor > 635 or xcor < 65
           [ moveBarrels 1]
           [ moveBarrels 14]]
@@ -189,7 +196,8 @@ end
 
 to moveUp;allows mario to move up a ladder
   ask marios [
-    if ladderPatch? = true [; the true value set previously really comes in handy
+  ; Only move if on a ladder patch
+    if ladderPatch? = true [
        set shape "climbingmario"
        set heading 0
        set ycor ycor + 1]]
@@ -204,6 +212,7 @@ end
 
 to moveDown;allows mario to move down a ladder
   ask marios [
+  ; Only move if on a ladder patch
     if ladderPatch? = true [
     set shape "climbingmario"
     set heading 0
