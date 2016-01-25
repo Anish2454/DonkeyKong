@@ -3,7 +3,7 @@ breed [ barrels barrel ]
 breed [ marios mario ]
 marios-own [ cord velocity withground?]
 barrels-own [ withground? direction]
-globals [timestep acceleration lives score]
+globals [timestep acceleration lives score highscore]
 
 
 ; ------------------------------ SETUP --------------------------------
@@ -13,6 +13,7 @@ to startscreensetup
   resize-world 0 700 0 700
   set-patch-size 1
   import-pcolors "insertcoin.jpg"
+  set highscore 0
 end
 
 to flash
@@ -84,9 +85,14 @@ to go
     create-barrels 1 [
       barrelSetup ] ]
   checkForDeathBarrels
-    if lives = 0 [deathscreen]
+    ifelse any? Marios with [ xcor < 377 and ycor > 580]
+[winscreen
+  stop]
+[if lives = 0 [deathscreen ]]
   score1
+  highestscore
 end
+
 
 to gowithGroundMario
   ask marios [
@@ -230,6 +236,14 @@ to score1
     [set score score + 100]
     ]
 end
+
+to winscreen
+  ca
+  import-pcolors "win.png"
+end
+to highestscore
+  if score > highscore [set highscore score]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -261,9 +275,9 @@ ticks
 BUTTON
 22
 44
-115
+107
 77
-Insert Coin
+NIL
 insertcoin\n
 NIL
 1
@@ -378,10 +392,10 @@ NIL
 1
 
 BUTTON
-77
-364
-167
-397
+65
+410
+155
+443
 NIL
 marioreset\n
 NIL
@@ -429,6 +443,17 @@ MONITOR
 303
                            SCORE
 score
+17
+1
+11
+
+MONITOR
+-1
+348
+208
+393
+Highscore
+highscore
 17
 1
 11
