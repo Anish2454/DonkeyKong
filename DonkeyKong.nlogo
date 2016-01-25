@@ -8,7 +8,7 @@ globals [timestep acceleration lives score highscore]
 
 ; ------------------------------ SETUP --------------------------------
 
-to startscreensetup
+to startscreensetup;imports start screen and sets highscore to 0
   ca
   resize-world 0 700 0 700
   set-patch-size 1
@@ -16,14 +16,14 @@ to startscreensetup
   set highscore 0
 end
 
-to flash
+to flash; additional function for cool effects to the start screen just for fun
   set og pcolor
   set pcolor black
   wait .5
   set pcolor og
 end
 
-to insertcoin
+to insertcoin; brings all the set up functions together
   importMap
   ask patches
     [ patches_setup ]
@@ -42,13 +42,13 @@ to setupPhysics
   set acceleration 12
 end
 
-to importMap
+to importMap;imports main world map
   resize-world 0 700 0 700
   set-patch-size 1
   import-pcolors "donkeykong1.jpg"
 end
 
-to patches_setup
+to patches_setup; sets up certain patches to be true which helps in the later parts of the code such as gowithGroundMario function
   set origcolor pcolor
   if shade-of? pcolor orange or shade-of? pcolor red
     [ set ground? true
@@ -59,7 +59,7 @@ to patches_setup
         [ set ladderPatch? true ]]
 end
 
-to mario_setup
+to mario_setup;sets up mario
   set xcor 155
   set ycor 90
   set size 60
@@ -68,7 +68,7 @@ to mario_setup
   set velocity 0
 end
 
-to barrelSetup
+to barrelSetup;spawns barrels
   setxy 198 530
   set size 60
   set heading 0
@@ -79,7 +79,7 @@ end
 ; -----------------------------------------------------------------------
 
 
-to go
+to go;main go function. This makes everything work together and starts the game
   ifelse any? Marios with [ xcor < 377 and ycor > 580]
     [ winscreen ]
     [ checkForDeathMario
@@ -92,13 +92,13 @@ to go
       if lives = 0 [deathscreen]]
 end
 
-to createBarrelsPeriodically
+to createBarrelsPeriodically; controls how often the barrels come
   every 10 [
          create-barrels 1 [
             barrelSetup ] ]
 end
 
-to gowithGroundMario
+to gowithGroundMario; makes sure mario walks along the platform
   ask marios [
     checkForDeathMario
     if ladderPatch? != true
@@ -106,7 +106,7 @@ to gowithGroundMario
 end
 
 
-to gowithGroundBarrel
+to gowithGroundBarrel; makes sure barrels go along the platforms
   ask barrels
     [gravity]
   wait 0.0035
@@ -114,7 +114,7 @@ to gowithGroundBarrel
     [moveBarrels 1]
 end
 
-to moveBarrels [speed]
+to moveBarrels [speed]; makes the barrels move and how fast they move
   if xcor >= 645 or xcor <= 55
         [set direction direction * -1
           set xcor xcor + (direction * 10) ]
@@ -129,23 +129,23 @@ to gravity
        [ set ycor ycor + 1]]
 end
 
-to checkForDeathBarrels
+to checkForDeathBarrels; Controls when barrels die
   ask barrels [
     if xcor < 110 and ycor < 100
       [ die ]
   ]
 end
 
-to checkForDeathMario
+to checkForDeathMario; kills mario when he comes in contact with a barrel
   ask marios [
-    if any? barrels in-radius 15 [
+    if any? barrels in-radius 15 [; if its near a certain radius he dies
       deathanimation
-      set lives lives - 1 ]
+      set lives lives - 1 ];mario loses 1 life when he dies
   ]
 end
 
 ; --------------------- JUMP FUNCTIONS (VARLET ALGORITHM) -----------------------
-to jumpfinal
+to jumpfinal; controls marios jumping
   ask marios [ set shape "mariojumping"
     set heading 0]
   resetPhysics
@@ -165,7 +165,7 @@ to jumpMario [dist directionJump ]
   ask marios [
   repeat dist [
         checkForDeathMario
-        set ycor ycor + directionJump * (timestep * (velocity + timestep * acceleration / 2))
+        set ycor ycor + directionJump * (timestep * (velocity + timestep * acceleration / 2));varely algorithm
         set velocity velocity + timestep * acceleration
         ask barrels [
           ifelse xcor > 635 or xcor < 65
@@ -180,29 +180,29 @@ end
 
 
 ; -------------------------- Functions For Movement --------------------------
-to moveRight
+to moveRight; allows mario to run right
   ask marios [
     set shape "runningmarioright"
     set heading 0
     set xcor xcor + 3]
 end
 
-to moveUp
+to moveUp;allows mario to move up a ladder
   ask marios [
-    if ladderPatch? = true [
+    if ladderPatch? = true [; the true value set previously really comes in handy
        set shape "climbingmario"
        set heading 0
        set ycor ycor + 1]]
 end
 
-to moveLeft
+to moveLeft; allows mario to move left
   ask marios [
     set shape "runningmarioleft"
     set heading 0
     set xcor xcor - 3 ]
 end
 
-to moveDown
+to moveDown;allows mario to move down a ladder
   ask marios [
     if ladderPatch? = true [
     set shape "climbingmario"
@@ -211,7 +211,7 @@ to moveDown
 end
 
 ; ----------------------------------------------------------------------------------
-to marioreset
+to marioreset; resets mario and barrels to their original posistion. This is important for when he dies
   ask marios [
     set xcor 155
     set ycor 90]
@@ -222,26 +222,26 @@ to marioreset
 end
 
 
-to deathanimation
+to deathanimation; animation for when mario dies
   ask marios [set shape "ripmario"]
   wait 0.1
   ask barrels [die]
   marioreset
 end
 
-to deathscreen
+to deathscreen; imports death screen
   ca
   import-pcolors "gameover.gif"
 end
 
-to score1
+to score1; keeps track of score when mario is within a certain radius
   ask marios [
     if any? barrels in-radius 70
     [set score score + 100]
     ]
 end
 
-to winscreen
+to winscreen;
   ifelse [hidden?] of one-of marios = true [
     import-pcolors "insertcoin.jpg" ]
     [ import-pcolors "win.png"
@@ -250,12 +250,7 @@ to winscreen
       wait 3]
 end
 
-to tempWin
-  ask marios [
-    setxy 380 580
-  ]
-end
-to highestscore
+to highestscore;keeps track of highscore
   if score > highscore [set highscore score]
 end
 @#$#@#$#@
@@ -304,10 +299,10 @@ NIL
 1
 
 BUTTON
-142
-143
-206
-176
+144
+144
+208
+177
 NIL
 moveRight
 NIL
@@ -406,23 +401,6 @@ NIL
 1
 
 BUTTON
-65
-410
-155
-443
-NIL
-marioreset\n
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
 57
 10
 152
@@ -466,65 +444,62 @@ MONITOR
 348
 208
 393
-                       HIGHSCORE
+Highscore
 highscore
 17
 1
 11
 
-BUTTON
-73
-516
-153
-549
-NIL
-tempWin\n
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+Recreation of the classic platform  game “Donkey Kong” in Netlogo. There are some things taken out from the original game such as the fire enemies and some ladders. However, this doesn’t affect the game that much. The user plays as Mario and tries to work his way to the top of them map while dodging barrels in order to save Princess Peach
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+There are two main breeds in the game: Mario and Barrels
+
+Rules for Mario:
+If you are next to princess peach, then you winIf the patch directly beneath you is not a “ground patch” (a patch that is part of the red platform), then repeatedly set your ycor one less until this condition is met. If however the patch above your feet is a ground patch (you’ve “sunken” into the platform) then set your ycor to one more until you are above the platform. This is run constantly to ensure that mario is always above the platform
+If you die with lives remaining, then just go back to the start. If no more lives are left, then end the game
+If there is a barrel within a specified radius, then die
+If you are next to princess peach, then you have won
+You can only move up or down if you are currently on a ladder patch
+
+Rules for Barrels:
+Same as #1 for Mario
+Keep setting your xcor to 1 more or 1 less, depending on your direction attribute
+If your xcor is out of the bounds of the platform, then roll in the other direction
+If you are at the fire, then die
+
+Rules for Patches:
+If you are a patch on the platform (pcolor = red) then set your ground? attribute to true
+If you are a patch on a ladder (pcolor = blue) then set your ladderpatch? attribute to true and also ask any patches in your radius to do the same (this is to make the black patches inside the ladders also a ladderpatch)
+
+Barrels are spawned every 10 seconds using the “every” primitive
+Mario is moved using the up, down, left, right, and jump functions
+The jump function uses the Verlet Algorithm to create the allusion of gravity which is described here:
+
+The acceleration and change in time are declared as global variables as they do not change
+The velocity variable is a marios-own variable
+We update mario’s ycor as he accelerates up, then we accelerate him down back to his original spot
+
+
 
 ## HOW TO USE IT
-
-(how to use the model, including a description of each of the items in the Interface tab)
-
+If it’s your first time playing, press setup to load up the start screen. Once in the start screen, press the insert coin button to start. When the game loads use the A to move left, S to move down ladders, D to move right, and W to move up ladders. Press J to jump. The monitor keeps track off score, lives and highscore. Score resets every time you start a new game whether it's dying, winning, etc. The highscore only resets if you die or press setup.
 ## THINGS TO NOTICE
 
 (suggested things for the user to notice while running the model)
 
-## THINGS TO TRY
-
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
 
 ## EXTENDING THE MODEL
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
-
-## NETLOGO FEATURES
-
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
-
-## RELATED MODELS
-
-(models in the NetLogo Models Library and elsewhere which are of related interest)
+You can add more enemies by breeding new turtles to make the game more difficult. You can also increase the rate at which barrels come out.
 
 ## CREDITS AND REFERENCES
 
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+Verlet Algorithm : https://en.wikipedia.org/wiki/Verlet_integration
 @#$#@#$#@
 default
 true
