@@ -27,6 +27,9 @@ to insertcoin
   importMap
   ask patches
     [ patches_setup ]
+  if any? turtles [
+    ask turtles [
+      die ]]
   create-marios 1
     [ mario_setup ]
   setupPhysics
@@ -40,7 +43,6 @@ to setupPhysics
 end
 
 to importMap
-  ca
   resize-world 0 700 0 700
   set-patch-size 1
   import-pcolors "donkeykong1.jpg"
@@ -78,21 +80,23 @@ end
 
 
 to go
-  checkForDeathMario
-  goWithGroundMario
-  goWithGroundBarrel
-  every 10 [
-    create-barrels 1 [
-      barrelSetup ] ]
-  checkForDeathBarrels
-    ifelse any? Marios with [ xcor < 377 and ycor > 580]
-[winscreen
-  stop]
-[if lives = 0 [deathscreen ]]
-  score1
-  highestscore
+  ifelse any? Marios with [ xcor < 377 and ycor > 580]
+    [ winscreen ]
+    [ checkForDeathMario
+      goWithGroundMario
+      goWithGroundBarrel
+      createBarrelsPeriodically
+      checkForDeathBarrels
+      score1
+      highestscore
+      if lives = 0 [deathscreen]]
 end
 
+to createBarrelsPeriodically
+  every 10 [
+         create-barrels 1 [
+            barrelSetup ] ]
+end
 
 to gowithGroundMario
   ask marios [
@@ -238,8 +242,18 @@ to score1
 end
 
 to winscreen
-  ca
-  import-pcolors "win.png"
+  ifelse [hidden?] of one-of marios = true [
+    import-pcolors "insertcoin.jpg" ]
+    [ import-pcolors "win.png"
+      ask turtles [
+        set hidden? true]
+      wait 3]
+end
+
+to tempWin
+  ask marios [
+    setxy 380 580
+  ]
 end
 to highestscore
   if score > highscore [set highscore score]
@@ -290,10 +304,10 @@ NIL
 1
 
 BUTTON
-144
-144
-208
-177
+142
+143
+206
+176
 NIL
 moveRight
 NIL
@@ -452,11 +466,28 @@ MONITOR
 348
 208
 393
-Highscore
+                       HIGHSCORE
 highscore
 17
 1
 11
+
+BUTTON
+73
+516
+153
+549
+NIL
+tempWin\n
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
