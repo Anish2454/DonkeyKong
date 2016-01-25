@@ -1,4 +1,4 @@
-patches-own [ origColor ladderPatch ground? pcord og]
+patches-own [ origColor ladderPatch? ground? pcord og]
 breed [ barrels barrel ]
 breed [ marios mario ]
 marios-own [ cord velocity withground?]
@@ -13,12 +13,12 @@ to startscreensetup
   resize-world 0 700 0 700
   set-patch-size 1
   import-pcolors "insertcoin.jpg"
- end
+end
 
 to flash
   set og pcolor
   set pcolor black
-  wait .1
+  wait .5
   set pcolor og
 end
 
@@ -48,11 +48,12 @@ end
 to patches_setup
   set origcolor pcolor
   if shade-of? pcolor orange or shade-of? pcolor red
-    [ set ground? true ]
+    [ set ground? true
+      set ladderPatch? true ]
   if shade-of? pcolor blue
-    [ set ladderPatch true
-      ask patches in-radius 15
-        [ set ladderPatch true ]]
+    [ set ladderPatch? true
+      ask patches in-radius 10
+        [ set ladderPatch? true ]]
 end
 
 to mario_setup
@@ -90,7 +91,7 @@ end
 to gowithGroundMario
   ask marios [
     checkForDeathMario
-    if ladderPatch != true
+    if ladderPatch? != true
       [ gravity ] ]
 end
 
@@ -104,7 +105,7 @@ to gowithGroundBarrel
 end
 
 to moveBarrels [speed]
-  if xcor >= 647 or xcor <= 61
+  if xcor >= 645 or xcor <= 55
         [set direction direction * -1
           set xcor xcor + (direction * 10) ]
   set xcor xcor + (direction * speed)
@@ -153,7 +154,7 @@ end
 to jumpMario [dist directionJump ]
   ask marios [
   repeat dist [
-    ;checkForDeathMario
+        checkForDeathMario
         set ycor ycor + directionJump * (timestep * (velocity + timestep * acceleration / 2))
         set velocity velocity + timestep * acceleration
         ask barrels [
@@ -171,7 +172,6 @@ end
 ; -------------------------- Functions For Movement --------------------------
 to moveRight
   ask marios [
-    ;checkForDeathMario
     set shape "runningmarioright"
     set heading 0
     set xcor xcor + 3]
@@ -179,15 +179,14 @@ end
 
 to moveUp
   ask marios [
-    ;checkForDeathMario
-  set shape "climbingmario"
-  set heading 0
-  set ycor ycor + 1]
+    if ladderPatch? = true [
+       set shape "climbingmario"
+       set heading 0
+       set ycor ycor + 1]]
 end
 
 to moveLeft
   ask marios [
-    ;checkForDeathMario
     set shape "runningmarioleft"
     set heading 0
     set xcor xcor - 3 ]
@@ -195,10 +194,10 @@ end
 
 to moveDown
   ask marios [
-    ;checkForDeathMario
+    if ladderPatch? = true [
     set shape "climbingmario"
     set heading 0
-    set ycor ycor - 1]
+    set ycor ycor - 1]]
 end
 
 ; ----------------------------------------------------------------------------------
@@ -211,6 +210,7 @@ to marioreset
     set direction 1
   ]
 end
+
 
 to deathanimation
   ask marios [set shape "ripmario"]
@@ -259,9 +259,9 @@ ticks
 30.0
 
 BUTTON
-21
+22
 44
-106
+107
 77
 NIL
 insertcoin\n
@@ -365,8 +365,8 @@ BUTTON
 195
 155
 228
-NIL
-jumpfinal
+Jump
+jumpfinal\n
 NIL
 1
 T
