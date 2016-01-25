@@ -52,7 +52,7 @@ to patches_setup
       set ladderPatch? true ]
   if shade-of? pcolor blue
     [ set ladderPatch? true
-      ask patches in-radius 10
+      ask patches in-radius 15
         [ set ladderPatch? true ]]
 end
 
@@ -158,7 +158,7 @@ to jumpMario [dist directionJump ]
         set ycor ycor + directionJump * (timestep * (velocity + timestep * acceleration / 2))
         set velocity velocity + timestep * acceleration
         ask barrels [
-          ifelse xcor > 645 or xcor < 71
+          ifelse xcor > 635 or xcor < 65
           [ moveBarrels 1]
           [ moveBarrels 14]]
         wait 0.08]
@@ -261,9 +261,9 @@ ticks
 BUTTON
 22
 44
-107
+115
 77
-NIL
+Insert Coin
 insertcoin\n
 NIL
 1
